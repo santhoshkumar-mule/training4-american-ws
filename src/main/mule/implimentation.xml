@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a1a66792-8669-44b8-bdce-9dbbcd48fae9" >
+		<http:listener-connection host="${http.host}" port="${http.port}"/>
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="3e8d25d8-ed68-4dd2-b0e7-b95d4465a4a1" >
+		<db:my-sql-connection host="mudb.learn.mulesoft.com" port="3306" user="mule" password="mule" database="training" />
+	</db:config>
+	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="15dabb02-cb10-432c-bd4a-bd85813f5b0d" keyGenerationExpression='#["key"]'>
+		<os:private-object-store maxEntries="100" entryTtl="30" expirationInterval="30" alias="object" expirationIntervalUnit="SECONDS"/>
+	</ee:object-store-caching-strategy>
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="a4277eef-b6a8-43da-800c-f4730084a81b" maxEntries="100" entryTtl="30" entryTtlUnit="MINUTES" expirationInterval="30" />
+	<flow name="postflight" doc:id="bb3a3c3e-621a-473e-853a-0b55e33b8d7f" >
+		<set-payload value='{"message": "Flight added (but not really)"}' doc:name="Set Payload" doc:id="f5e1fb1c-fd60-4c8e-923a-be93bf240b3e" />
+	</flow>
+	<flow name="Getflights" doc:id="c3c15c78-128d-42b1-95c8-6320afc551ee" >
+		<ee:cache doc:name="Cache" doc:id="2d252077-b342-4054-8b4a-74c2d0cecaa2" cachingStrategy-ref="Caching_Strategy">
+			<logger level="INFO" doc:name="Logger" doc:id="9739ab30-bb63-4e4c-83b5-b4201f8ef9fa" message='#["notchached"]'/>
+			<db:select doc:name="Select" doc:id="73a22c57-ee83-4d31-b8d1-d7893c426a67" config-ref="Database_Config">
+			<db:sql><![CDATA[select * from american
+]]></db:sql>
+		</db:select>
+		</ee:cache>
+		<os:store doc:name="Store" doc:id="e85ce93f-2366-4e0a-96c0-3495e76193f0" key='#["response"]' objectStore="Object_store"/>
+		<ee:transform doc:name="Transform Message" doc:id="6e7e1764-5eec-483d-a5a0-fa567457e191">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	ID: payload01.ID,
+	code: (payload01.code1default "") ++ (payload01.code2 default ""),
+	price: payload01.price default 0,
+	departureDate: payload01.takeOffDate as String default "",
+	origin: payload01.fromAirport default "",
+	destination: payload01.toAirport default "",
+	emptySeats: payload01.seatsAvailable default 0,
+	plane: {
+		"type": payload01.planeType default "",
+		totalSeats: payload01.totalSeats default 0
+	}
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="getflightsbyID" doc:id="31941613-0d40-4f5f-a02c-3084b42a35ad" >
+		<db:select doc:name="Copy_of_Select" doc:id="7cb6aed9-ad34-4872-9209-0c4a0d3ba675" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * 
+from american
+WHERE ID = :ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'ID' : attributes.uriParams.ID}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="8c73276b-afe7-4f1c-8bcb-dc9c477ccc48" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	ID: payload01.ID,
+	code: (payload01.code1default "") ++ (payload01.code2 default ""),
+	price: payload01.price default 0,
+	departureDate: payload01.takeOffDate as String default "",
+	origin: payload01.fromAirport default "",
+	destination: payload01.toAirport default "",
+	emptySeats: payload01.seatsAvailable default 0,
+	plane: {
+		"type": payload01.planeType default "",
+		totalSeats: payload01.totalSeats default 0
+	}
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
