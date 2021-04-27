@@ -6,10 +6,12 @@ pipeline {
                 echo 'Hello World'
             }
         }
-    }
+        stage('build the code'){
+             steps              {
+               echo 'build checking'
+               sh 'mvn clean install'
+                                  }
+                       }
+              }
 }
 
-stage("build the code"){
-   echo 'build checking'
-   sh 'mvn clean install'
-}
