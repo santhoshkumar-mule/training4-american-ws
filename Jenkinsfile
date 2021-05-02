@@ -9,7 +9,7 @@ pipeline {
         stage('build the code'){
              steps              {
                echo 'build checking'
-               sh 'mvn  clean package -DskipTests'
+               bat 'mvn  clean package -DskipTests'
                                   }
                        }
               }
