@@ -12,6 +12,12 @@ pipeline {
                bat 'mvn  clean package -DskipTests'
                                   }
                        }
+         stage('run munits'){
+             steps              {
+               echo 'build checking'
+               bat 'mvn  clean package '
+                                  }
+                       }
               }
 }
 

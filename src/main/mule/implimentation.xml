@@ -28,7 +28,6 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 ]]></db:sql>
 		</db:select>
 		</ee:cache>
-		<os:store doc:name="Store" doc:id="e85ce93f-2366-4e0a-96c0-3495e76193f0" key='#["response"]' objectStore="Object_store"/>
 		<ee:transform doc:name="Transform Message" doc:id="6e7e1764-5eec-483d-a5a0-fa567457e191">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0

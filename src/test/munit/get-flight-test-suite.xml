@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<munit:config name="get-flight-test-suite.xml" />
+	<http:request-config name="HTTP_test_Request_configuration" doc:name="HTTP Request configuration" doc:id="ef71a09a-2c29-4553-867f-1b4d387a94f8" basePath="/api">
+		<http:request-connection host="localhost" port="8083" />
+	</http:request-config>
+	<munit:test name="get-flight-test-suiteTest" doc:id="5dfe8b1b-e849-4186-8f9d-f9927ccc935d" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="02dd6f45-2444-424d-ae6f-d3821487c398" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Select" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:attributes value="#[{'statusCode' : '200' }]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<http:request method="GET" doc:name="Request" doc:id="cf3b6866-e2a3-42ab-a7d9-7ca9a54e7510" config-ref="HTTP_test_Request_configuration" path="/Flights"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="c54ac2c6-2a8e-4909-af3f-7f324ef6dd6f" expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>
