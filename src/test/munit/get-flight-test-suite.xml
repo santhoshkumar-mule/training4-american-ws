@@ -10,9 +10,14 @@
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<munit:config name="get-flight-test-suite.xml" />
 	<http:request-config name="HTTP_test_Request_configuration" doc:name="HTTP Request configuration" doc:id="ef71a09a-2c29-4553-867f-1b4d387a94f8" basePath="/api">
-		<http:request-connection host="localhost" port="8083" />
+		<http:request-connection host="0.0.0.0" port="8083" />
 	</http:request-config>
 	<munit:test name="get-flight-test-suiteTest" doc:id="5dfe8b1b-e849-4186-8f9d-f9927ccc935d" >
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="american-flights-api-main" />
+			<munit:enable-flow-source value="get:\Flights:american-flights-api-config" />
+			<munit:enable-flow-source value="Getflights" />
+		</munit:enable-flow-sources>
 		<munit:behavior >
 			<munit-tools:mock-when doc:name="Mock when" doc:id="02dd6f45-2444-424d-ae6f-d3821487c398" processor="db:select">
 				<munit-tools:with-attributes >
