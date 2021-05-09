@@ -133,7 +133,7 @@ output application/json
             </ee:message>
         </ee:transform>
     </flow>
-    <flow name="get:\Flights:american-flights-api-config">
+    <flow name="get:\Flights:american-flights-api-config" initialState="started">
         <flow-ref doc:name="getFlights" doc:id="a4ae06c8-9112-43d4-a08f-2db11d396551" name="Getflights" />
     </flow>
     <flow name="get:\Flights\(ID):american-flights-api-config">
