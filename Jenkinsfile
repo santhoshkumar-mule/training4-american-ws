@@ -15,7 +15,7 @@ pipeline {
          stage('run munits'){
              steps              {
                echo 'build checking'
-               bat 'mvn  clean package '
+               bat 'mvn  clean package'
                                   }
                        }
               }
