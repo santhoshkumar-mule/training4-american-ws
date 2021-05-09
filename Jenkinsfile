@@ -18,7 +18,7 @@ pipeline {
          stage('run munits'){
              steps              {
                echo 'build checking'
-               bat 'mvn test'
+               bat 'mvn test -X'
                                   }
                        }
               }
