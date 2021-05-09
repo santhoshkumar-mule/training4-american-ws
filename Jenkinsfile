@@ -3,7 +3,10 @@ pipeline {
     stages { 
         stage('Example') {
             steps {
+            deleteDir()
+            checkout scm
                 echo 'Hello World'
+                
             }
         }
         stage('build the code'){
